@@ -1,0 +1,38 @@
+1) Find all pizzas eaten by at least one female over the age of 20.
+\project_{pizza} (
+((\project_{name} Person)
+ \diff 
+ (\project_{name} 
+  \select_{gender<>'female' or age <= 20} Person) \join Eats))
+
+2) Find the names of all females who eat at least one pizza served by Straw Hat.
+\project_{name} (\project_{name, pizza} (\select_{gender='female'} Person \join Eats) \join \project_{pizza} (\select_{pizzeria='Straw Hat'} Serves))
+
+3) Find all pizzerias that serve at least one pizza for less than $10 that either Amy or Fay (or both) eat.
+\project_{pizzeria} (\select_{price<10} (Serves \join \project_{pizza} (\select_{name='Amy' or name='Fay'} Eats)))
+
+4) Find all pizzerias that serve at least one pizza for less than $10 that both Amy and Fay eat. 
+\project_{pizzeria} (\select_{price<10} (Serves \join (\project_{pizza} (\select_{name='Amy'} Eats) \join \project_{pizza} (\select_{name='Fay'} Eats))))
+
+5) Find the names of all people who eat at least one pizza served by Dominos but who do not frequent Dominos.
+\project_{name} (Eats \join \project_{pizza} (\select_{pizzeria='Dominos'} Serves)) \diff \project_{name} (\select_{pizzeria='Dominos'} Frequents)
+
+6) Find all pizzas that are eaten exclusively by people younger than 24, or that cost less than $10 everywhere they're served. 
+(\project_{pizza} Serves) \diff (\project_{pizza}(\select_{price>=10} Serves)) \union (\project_{pizza} (\project_{name} (\select_{age<24} Person) \join Eats) \diff \project_{pizza} (\project_{name} (\select_{age>=24} Person) \join Eats))
+
+(The union has to be in this order, opposite does only return one element, why?)
+
+7) Find the age of the oldest person (or people) who eat mushroom pizza. 
+\project_{age} (\project_{n1} \select_{n1<>n2 and a1>=a2}((\rename_{n1,a1} \project_{name, age} \select_{pizza='mushroom'} (Person \join Eats)) \cross (\rename_{n2,a2}\project_{name, age} \select_{pizza='mushroom'} (Person \join Eats)))
+\diff
+\project_{n1} \select_{n1<>n2 and a1<a2}((\rename_{n1,a1} \project_{name, age} \select_{pizza='mushroom'} (Person \join Eats)) \cross (\rename_{n2,a2}\project_{name, age} \select_{pizza='mushroom'} (Person \join Eats))) \join \rename_{n1,age,gender} Person)
+
+
+8) Find all pizzerias that serve only pizzas eaten by people over 30. 
+\project_{pizzeria} (Serves \join \project_{pizza} (\select_{age>30} Person \join Eats)) \diff
+\project_{pizzeria} (Serves \join (\project_{pizza} Serves \diff \project_{pizza} (\select_{age>30} Person \join Eats)))
+
+9) Find all pizzerias that serve every pizza eaten by people over 30. 
+\project_{pizzeria} (Serves \join \project_{pizza} (\select_{age>30} Person \join Eats))
+\diff
+\project_{pizzeria} (\project_{pizzeria} Serves \cross \project_{pizza} (\select_{age>30} Person \join Eats) \diff \project_{pizzeria, pizza} (Serves \join \project_{pizza} (\select_{age>30} Person \join Eats)))
