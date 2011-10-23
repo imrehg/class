@@ -17,10 +17,15 @@ grad = zeros(size(theta));
 %               Compute the partial derivatives and set grad to the partial
 %               derivatives of the cost w.r.t. each parameter in theta
 
-
-
-
-
+% hypothesis in logistic regression
+n = size(theta)(1);
+h = sigmoid(X * theta);
+% vectorized form
+J = (-y' * log(h) - (1-y)' * log(1 - h))/m + lambda/(2*m)*theta(2:n)'*theta(2:n);
+% Gradient
+regular = lambda * eye(n);
+regular(1,1) = 0;
+grad = (X' * (h - y) + regular * theta)/m;
 
 % =============================================================
 

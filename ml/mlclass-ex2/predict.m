@@ -15,11 +15,9 @@ p = zeros(m, 1);
 %               You should set p to a vector of 0's and 1's
 %
 
-
-
-
-
-
+% Round takes <0.5 values to 0, and >=0.5 values to 1, the way we want.
+% should come up with some more robust way later
+p = round(sigmoid(X * theta));
 
 % =========================================================================
 

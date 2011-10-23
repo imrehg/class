@@ -12,13 +12,12 @@ figure; hold on;
 %               examples and 'ko' for the negative examples.
 %
 
+% separating into y=0 and y=1 groups
+X0 = X(find(y==0),:);
+X1 = X(find(y==1),:);
 
-
-
-
-
-
-
+plot(X0(:,1), X0(:,2), 'ko', 'MarkerSize', 7);
+plot(X1(:,1), X1(:,2), 'k+', 'LineWidth', 2, 'MarkerSize', 7);
 
 % =========================================================================
 

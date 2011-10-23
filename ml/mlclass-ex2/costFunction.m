@@ -20,12 +20,12 @@ grad = zeros(size(theta));
 % Note: grad should have the same dimensions as theta
 %
 
-
-
-
-
-
-
+% hypothesis in logistic regression
+h = sigmoid(X * theta);
+% vectorized form
+J = (-y' * log(h) - (1-y)' * log(1 - h))/m;
+% Gradient
+grad = (X' * (h - y))/m;
 
 % =============================================================
 
