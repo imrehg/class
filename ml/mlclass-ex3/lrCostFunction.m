@@ -36,14 +36,19 @@ grad = zeros(size(theta));
 %           grad = grad + YOUR_CODE_HERE (using the temp variable)
 %
 
+% Number of features
+n = size(theta)(1);
 
+% Prediction fuction
+predict = sigmoid(X * theta);
 
+% Cost function's vectorized form
+J = (-y'*log(predict) - (1-y)'*log(1-predict))/m  + lambda/(2*m)*theta(2:n)'*theta(2:n);
 
-
-
-
-
-
+% Gradient function
+regular = lambda * eye(n);
+regular(1,1) = 0;
+grad = (X' * (predict - y) + regular * theta)/m;
 
 % =============================================================
 
