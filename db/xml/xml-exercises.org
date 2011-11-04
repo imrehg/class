@@ -1,0 +1,132 @@
+* XML Course-Catalog XPath and XQuery Exercises
+  Using: courses-noID.xml
+  The solution will need to reference doc("courses.xml") to access the data.
+** Return all Title elements (of both departments and courses)
+   XPATH: doc("courses.xml")//Title
+   XQUERY: for $t in doc("courses.xml")//Title return $t
+** Return last names of all department chairs.
+   XPATH: doc("courses.xml")//Department/Chair/*/Last_Name
+   XQUERY: for $d in doc("courses.xml")//Department/Chair return $d/*/Last_Name
+** Return titles of courses with enrollment greater than 500.
+   XPATH: doc("courses.xml")//Course[@Enrollment>500]/Title
+   XQUERY: for $c in doc("courses.xml")//Course where $c/@Enrollment > 500 return $c/Title 
+** Return titles of departments that have some course that takes "CS106B" as a prerequisite.
+   XPATH: doc("courses.xml")//Department[Course/Prerequisites/Prereq = "CS106B"]/Title
+** Return last names of all professors or lecturers who use a middle initial. Don't worry about eliminating duplicates. 
+   XPATH: doc("courses.xml")//(Professor|Lecturer)[Middle_Initial]/Last_Name
+** Return the count of courses that have a cross-listed course (i.e., that have "Cross-listed" in their description).
+   XPATH: doc("courses.xml")/count(//Course[contains(Description, "Cross-listed")])
+** Return the average enrollment of all courses in the CS department.
+   XPATH: doc("courses.xml")/avg(//Department[@Code="CS"]/Course/@Enrollment/number())
+** Return last names of instructors teaching at least one course that has "system" in its description and enrollment greater than 100.
+   XPATH: doc("courses.xml")//Course[@Enrollment > 100 and contains(Description, "system")]//Last_Name
+** Return the title of the course with the largest enrollment.
+   XPATH: doc("courses.xml")//Course[@Enrollment = max(//Course/@Enrollment/number())]/Title
+   there has to be some other way as well, I think, because I have a feeling they were thinking of something trickier...
+* XML Course-Catalog XSLT Exercises
+  Same database, just using different kinda language
+** Return a list of department titles.
+   <?xml version="1.0" encoding="ISO-8859-1"?>
+   <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+     <xsl:template match="Department">
+       <xsl:copy-of select="Title"/>
+     </xsl:template>
+   </xsl:stylesheet>
+** Return a list of department elements with no attributes and two subelements each: the department title and the entire Chair subelement structure.
+   <?xml version="1.0" encoding="ISO-8859-1"?>
+   <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+     <xsl:template match="Department">
+       <Department>
+         <xsl:copy-of select="Title"/>
+         <xsl:copy-of select="Chair"/>
+       </Department>
+     </xsl:template>
+   </xsl:stylesheet>
+
+* XML World-Countries XPath and XQuery Exercises
+  Using: countries.xml
+  Your solution will need to reference doc("countries.xml") to access the data.
+** Return the area of Mongolia.
+   XPATH: doc("countries.xml")//country[@name="Mongolia"]/data(@area)
+** Return the names of all cities that have the same name as the country in which they are located.
+   XPATH: doc("countries.xml")//country/city[name = ../@name]/name
+   (the "parent::" element might be used here, which is the same as "..")
+** Return the average population of Russian-speaking countries.
+   XPATH: doc("countries.xml")/avg(//country[language = "Russian"]/@population/number())
+** Return the names of all countries that have at least three cities with population greater than 3 million.
+   XPATH: doc("countries.xml")//country[count(city[population > 3000000]) >= 3]/data(@name)
+** Create a list of French-speaking and German-speaking countries. The result should take the form:
+   XQuery:
+   <result>
+     <French>
+       {for $c in doc("countries.xml")//country where $c/language = "French" return <country>{$c/data(@name)}</country>}
+     </French>
+     <German>
+       {for $c in doc("countries.xml")//country where $c/language = "German" return <country>{$c/data(@name)}</country>}
+     </German>
+   </result>
+** Return the countries with the highest and lowest population densities. Note that because the "/" operator has its own meaning in XPath and XQuery, the division operator is infix "div". To compute population density use "(@population div @area)". You can assume density values are unique.
+   XQuery:
+   <result>
+     {let $maxdens := doc("countries.xml")/max(//country/data(@population div @area))
+      for $c in doc("countries.xml")//country
+      where $c/data(@population div @area) = $maxdens
+      return <highest density="{ $maxdens }">{$c/data(@name)}</highest>}
+     {let $mindens := doc("countries.xml")/min(//country/data(@population div @area))
+      for $c in doc("countries.xml")//country
+      where $c/data(@population div @area) = $mindens
+      return <lowest density="{ $mindens }">{$c/data(@name)}</lowest>}
+   </result>
+   I wonder if there's a better way, not to double everything?
+* XML World-Countries XSLT Exercises
+  Using: countries.xml
+  Your solution will need to reference doc("countries.xml") to access the data.
+** Return all countries with population between 9 and 10 million. Retain the structure of country elements from the original data.
+   <?xml version="1.0" encoding="ISO-8859-1"?>
+   <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+     <xsl:template match="country[@population &gt; 9000000 and @population &lt; 10000000]">
+       <xsl:copy-of select="." />
+     </xsl:template>
+     <xsl:template match="text()" />
+   </xsl:stylesheet>
+** Create a table using HTML constructs that lists all countries that have more than 3 languages. Each row should contain the country name in bold, population, area, and number of languages. Sort the rows in descending order of number of languages; no header is needed. (Hint: You may find the data-type and order attributes of <xsl:sort> to be useful.)
+   <?xml version="1.0" encoding="ISO-8859-1"?>
+   <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+   <xsl:template match="/countries">
+   <html>
+     <table border="1">
+       <xsl:for-each select="country">
+         <xsl:sort select="count(language)" order="descending"/>
+         <xsl:if test="count(language) &gt; 3">
+           <tr>
+             <td><b><xsl:value-of select="@name" /></b></td>
+             <td><xsl:value-of select="@population" /></td>
+             <td><xsl:value-of select="@area" /></td>
+             <td><xsl:value-of select="count(language)" /></td>
+           </tr>
+         </xsl:if>
+       </xsl:for-each>
+     </table>
+   </html>
+   </xsl:template>
+   </xsl:stylesheet>
+** Create an alternate version of the countries database: for each country, include its name and population as sublements, and the number of languages and number of cities as attributes (called "languages" and "cities" respectively).
+   <?xml version="1.0" encoding="ISO-8859-1"?>
+   <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+   <xsl:template match="/countries">
+     <countries>
+       <xsl:for-each select="country">
+         <country>
+	 <xsl:attribute name="cities">
+	 <xsl:value-of select="count(city)" />
+	 </xsl:attribute>
+	 <xsl:attribute name="languages">
+	 <xsl:value-of select="count(language)" />
+	 </xsl:attribute>
+	 <name><xsl:value-of select="@name" /></name>
+	 <population><xsl:value-of select="@population" /></population>
+	 </country>
+       </xsl:for-each>
+     </countries>
+   </xsl:template>
+   </xsl:stylesheet>
