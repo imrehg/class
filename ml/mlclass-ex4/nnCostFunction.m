@@ -62,46 +62,47 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
-## Forward propagation
-
 # Create correct output classification matrix we can reuse
 base = eye(size(Theta2, 1));
+
+# Loop over training examples
 for k = 1:m
   yk = base(:, y(k));
-  a1 = [ 1; X(k, :)'];
-  a2 = [ 1; sigmoid(Theta1 * a1)];
-  a3 = sigmoid(Theta2 * a2);
-  h = a3;
-  # J = J + (y(i, :)' * log(h) - (1-y(i, :))' * log(1-h)) / m;
-  J = J + (-yk'*log(h) - (1-yk)'*log(1-h));
-end			
-J = J / m;
-# Add regularization
-J = J + (sum(sum(Theta1(:, 2:end).^2)) + sum(sum(Theta2(:, 2:end).^2))) * lambda / (2*m);
 
-## Back propagation
-base = eye(size(Theta2, 1));
-for k = 1:1
-  yk = base(:, y(k));
+  ## Forward propagation
   a1 = [ 1; X(k, :)'];
-
   z2 = Theta1 * a1;
   a2 = [ 1; sigmoid(z2)];
-
   z3 = Theta2 * a2;
   a3 = sigmoid(z3);
 
+  # Cost function
+  J = J + (-yk'*log(a3) - (1-yk)'*log(1-a3));
+
+  # Gradient back propagation
   d3 = a3 - yk;
   d2 = (Theta2' * d3)(2:end) .* sigmoidGradient(z2);
 
   Theta1_grad = Theta1_grad + d2 * a1';
   Theta2_grad = Theta2_grad + d3 * a2';
 end
+# Cost function
+## Add regularization
+J = J + (sum(sum(Theta1(:, 2:end).^2)) + sum(sum(Theta2(:, 2:end).^2))) * lambda / 2;
+## The final division
+J = J / m;
+
+# Gradient
+## Add regularization
+nobias1 = ones(size(Theta1));
+nobias1(:, 1) *= 0;
+Theta1_grad = Theta1_grad + lambda * nobias1 .* Theta1;
+nobias2 = ones(size(Theta2));
+nobias2(:, 1) *= 0;
+Theta2_grad = Theta2_grad + lambda * nobias2 .* Theta2;
+## The final division
 Theta1_grad = Theta1_grad / m;
 Theta2_grad = Theta2_grad / m;
-
-
-
 
 % -------------------------------------------------------------
 
