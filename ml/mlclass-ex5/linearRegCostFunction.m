@@ -19,16 +19,16 @@ grad = zeros(size(theta));
 %               You should set J to the cost and grad to the gradient.
 %
 
+# regularization: just select the non-bias parameters
+reg = eye(length(theta));
+reg(1,1) = 0;
 
+# prediction
+h = X * theta;
 
-
-
-
-
-
-
-
-
+# Cost and gradient, with regularization
+J = (sum((h - y).^2) + lambda * theta(2:end)'*theta(2:end)) / (2*m);
+grad = (X' * (h - y) + reg*theta)/m;
 
 % =========================================================================
 
