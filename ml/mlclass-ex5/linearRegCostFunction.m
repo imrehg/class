@@ -20,7 +20,7 @@ grad = zeros(size(theta));
 %
 
 # regularization: just select the non-bias parameters
-reg = eye(length(theta));
+reg = eye(length(theta)) * lambda;
 reg(1,1) = 0;
 
 # prediction
