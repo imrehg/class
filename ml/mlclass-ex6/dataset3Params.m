@@ -23,10 +23,37 @@ sigma = 0.3;
 %        mean(double(predictions ~= yval))
 %
 
+% % Initial setup
+% bestpred = 0
 
+% % number of different parameter values to try each, this altogether
+% % there will be nval^2 training
+% nval = 15;
+% Clist = logspace(log10(0.01), log10(30), nval);
+% sigmalist = logspace(log10(0.01), log10(30), nval);
 
+% for i = 1:nval
+%   Ct = Clist(i);
+%   for j = 1:nval
+%    sigmat = sigmalist(j);
+%    model = svmTrain(X, y, Ct, @(x1, x2) gaussianKernel(x1, x2, sigmat));
+%    predictions = svmPredict(model, Xval);
+%    correct = mean(double(predictions == yval));
+%    if (correct > bestpred)  % if we are better than before, keep parameters
+%      C = Ct;
+%      sigma = sigmat;
+%      bestpred = correct;
+%    end
+%  end
+% end
 
+% %Final results
+% C
+% sigma
+% bestpred
 
+C =  0.97035
+sigma =  0.098506
 
 
 % =========================================================================
