@@ -21,11 +21,11 @@ idx = zeros(size(X,1), 1);
 % Note: You can use a for-loop over the examples to compute this.
 %
 
-
-
-
-
-
+n = size(X, 1);
+for i = 1:n
+  [m, ix] = min(diag((centroids - repmat(X(i, :), K, 1)) * (centroids - repmat(X(i, :), K, 1))'));
+  idx(i) = ix;
+end;
 
 % =============================================================
 
